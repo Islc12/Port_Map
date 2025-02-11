@@ -20,3 +20,11 @@
   ports however as of 2/10/2025 I haven't set up a way to generate that list unless a smaller custom list is started from the beginning.
 
 Any and all help for revision towards this would be appreciated.
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+### TODO
+Figure out a way to efficiently test for UDP ports. As it stands it only tests TCP, not sure if UDP will be on the challenge or not, but 
+we should probably anticipate it regardless. Right now adding the -sU option slows the script down quite a bit so hopefully we don't need
+to go the UDP route, but if so maybe just on site modification of the script will be all that is necessary. Filtering the results list
+may be necessary to avoid overlapping TCP/UDP ports.
