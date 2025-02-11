@@ -27,36 +27,33 @@
 # necessary. Filtering the results lists may be necessary to avoid overlapping TCP/UDP ports.
 
 echo "Enter target IP address: "
+#ipv4="192.168.0.1" # used for testing purposes
 read ipv4
 
 read_ports() {
     input_file="$1"
     while IFS= read -r PORT; do
-        output=$(nmap -p $PORT -T5 $ipv4 | tail -n +6 | head -n -3)
+        output=$(nmap -p "$PORT" -T5 "$ipv4" -Pn | tail -n +6 | head -n -3)
         # head and tail command allow me to view information as it comes across in stdout by only showing me as 
         # little information as I possibly need. From my understanding we only care if a port is open or closed
         # and so this gets rid of the rest of the junk, leaving us with port #, port status, and port service.
-        echo "$output"
-        if [[ "$output" == *open* ]]; then
+        echo $output
+        if [[ "$output" == *open* ]] && ! grep -q "^$PORT$" openports.txt 2>/dev/null; then
             printf "%s\n" $PORT >> openports.txt
             # becomes the new list of verified open ports to run against
-        elif [[ "$output" == *closed* ]]; then
+        elif [[ "$output" == *closed* ]] && ! grep -q "^$PORTS$" clsdports.txt 2>/dev/null; then
             printf "%s\n" $PORT >> clsdports.txt
-            # used for checking purposes in case nmap misidentified a port, this list can be run by itself and as long as
-            # none of the ports end up showing open this file can be trashed. This should only end up being run 
-        elif [[ "$output" == *filtered* ]]; then
+            sort -u clsdports.txt -o clsdports.txt
+        elif [[ "$output" == *filtered* ]] && ! grep -q "^$PORTS$" filtports.txt 2>/dev/null; then
             printf "%s\n" $PORT >> filtports.txt
+            sort -u filtports.txt -o filtports.txt
             # used for just in case a port isn't mapped because nmap cannot disginguish if a port is open or not
-        else
-            echo "Something went wrong"
         fi
     done < $input_file
 }
 
 echo "1. Initial or incremental port scan"
 echo "2. Confirmed open ports file"
-echo "3. Closed ports file"
-echo "4. Filtered ports file"
 echo ""
 echo "Enter which option to use for the port file "
 
@@ -64,14 +61,13 @@ read portselector;
 echo ""
 
 case $portselector in
-    1) echo "Enter port range (ex 22-80): "
+    1) echo "Enter port(s) and/or port range (ex. 22-80): "
        read ports
-       output=$(nmap -p $ports -T5 $ipv4 | tail -n +6 | head -n -3 | grep -oP '^\d+')
-       printf "%s\n" $output > testports.txt
+       output=$(nmap -p $ports -T5 $ipv4 | grep -oP '^\d+')
+       printf "%s\n" $output >> testports.txt
+       sort -u testports.txt -o testports.txt
        echo ""
        read_ports "testports.txt"
        ;;
     2) read_ports "openports.txt";;
-    3) read_ports "clsdports.txt";;
-    4) read_ports "filtports.txt";;
 esac
