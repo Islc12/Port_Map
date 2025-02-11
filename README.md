@@ -6,7 +6,7 @@
 
 ### Version 1 - 
   I think this is aligning somewhat with the intention of the CTF event, this script is designed to be fast through utilization
-  of the -T5 flag. It's also supposed to be accurate and give the user the ability to double check ports in the event that something
+  of the `-T5` flag. It's also supposed to be accurate and give the user the ability to double check ports in the event that something
   is still missing. I'm not entirely certain how the event is planned to go, but I'm assuming we're not supposed to know which lights
   go with which ports, its simply an "is it open or is it closed" type scenario. I'm also assuming that there will be some kind of 
   stdout check that a port is open/closed rather than just a light being off. If not then we'd need some kind of photodetector, a piece
